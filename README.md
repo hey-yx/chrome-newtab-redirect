@@ -20,17 +20,18 @@
 
 Custom New Tab 只做一件事：把新标签页变成你指定的网页。它不提供仪表盘、新闻流、快捷方式或搜索框，也不会修改其他网站的配色。
 
-很多新标签页扩展会顺带接管整个起始页；这个扩展刻意保持小：一个目标地址、一个语言选择、一个跟随系统的首帧颜色。没有构建步骤，没有第三方依赖，只申请 `storage` 权限。
+很多新标签页扩展会顺带接管整个起始页；这个扩展刻意保持小：一个目标地址、一个地址栏焦点开关、一个语言选择、一个跟随系统的首帧颜色。没有构建步骤，没有第三方依赖，只申请 `storage` 权限。
 
 ## 功能
 
-- **可配置目标地址** — 支持 `http://` / `https://`，不写协议自动补 `https://`，也接受 `localhost:3000` 这类 host:port 写法；`javascript:`、`ftp://`、`mailto:` 会被拒绝。
-- **跟随系统的首帧** — 系统亮色时新标签页先显示白色，暗色时先显示黑色，然后才跳转；重定向页本身不会闪出相反的颜色。
-- **默认留空** — 首次安装自动打开设置页；没有配置地址时，新标签页也会进入设置页，不会跳到某个预设站点。
-- **中英文设置页** — 默认英文，右上角可切换中文；语言选择会记住。
-- **极简权限** — 只申请 `storage`；没有 host permissions、content scripts、分析或远程代码。
-- **无构建步骤** — 原生 HTML/CSS/JS，加载已解压扩展即可运行。
-- **克制的界面** — Atelier 风格的冷纸色、单一靛蓝 accent、Charter/Songti 标题、4pt 间距；无卡片、无边框、无阴影，焦点和错误态只用 outline。
+- **可配置目标地址**：支持 `http://` / `https://`，不写协议自动补 `https://`，也接受 `localhost:3000` 这类 host:port 写法；`javascript:`、`ftp://`、`mailto:` 会被拒绝。
+- **跟随系统的首帧**：系统亮色时新标签页先显示白色，暗色时先显示黑色，然后才跳转；重定向页本身不会闪出相反的颜色。
+- **可选的地址栏焦点**：勾选后，新标签页跳转完成时地址栏仍然握着焦点，直接输入网址或搜索，不用先点一下地址栏。默认关闭。
+- **默认留空**：首次安装自动打开设置页；没有配置地址时，新标签页也会进入设置页，不会跳到某个预设站点。
+- **中英文设置页**：默认英文，右上角可切换中文；语言选择会记住。
+- **极简权限**：只申请 `storage`；没有 host permissions、content scripts、分析或远程代码。
+- **无构建步骤**：原生 HTML/CSS/JS，加载已解压扩展即可运行。
+- **克制的界面**：Atelier 风格的冷纸色、单一靛蓝 accent、Charter/Songti 标题、4pt 间距；无卡片、无边框、无阴影，焦点和错误态只用 outline。
 
 ## 演示
 
@@ -84,6 +85,7 @@ git clone https://github.com/hey-yx/chrome-newtab-redirect.git
 
 - **Page URL / 页面地址**：填写要打开的新标签页地址。保存后，下次打开新标签页生效。
 - **Save / 保存**：保存地址。只接受 `http://` 或 `https://`；不写协议会自动补 `https://`。
+- **Keep the address bar focused in new tabs / 打开新标签页后保留地址栏焦点**：勾选后，新标签页跳转完成时地址栏保持焦点，可以直接打字。它跟地址一起保存，清空地址不会关掉它。
 - **Clear / 清空**：移除地址。之后每次打开新标签页都会回到设置页，直到重新填写。
 - **EN / 中文**：切换界面语言，选择会保存。
 
@@ -101,14 +103,15 @@ flowchart LR
 ```
 
 - `redirect.html` 在页面最前面用 `prefers-color-scheme` 决定首帧是白色还是黑色，此时还没有任何外部内容。
-- `redirect.js` 从 `chrome.storage.local` 读取 `targetUrl`；地址为空或无效时打开 `options.html`。
+- `redirect.js` 从 `chrome.storage.local` 读取 `targetUrl` 和 `focusAddressBar`；地址为空或无效时打开 `options.html`。
+- 跳转有两种走法。开关关闭时用 `location.replace`，历史记录里只留目标页。开关打开时改用 `chrome.tabs.update` 让浏览器发起导航，页面没法把焦点从地址栏抢走，代价是这个新标签页的历史里会多出一条跳转页，在第一个页面按后退会重新加载一次目标页。
 - `background.js` 在首次安装时打开设置页，并处理工具栏图标的点击。
 - `options.html` / `options.css` / `options.js` 是设置页：地址校验、保存、清空、中英文切换。
 - 扩展本身不发起任何网络请求；唯一的网络流量是你配置的目标地址导航。
 
 ## 隐私与权限
 
-- **`storage`**：保存目标地址和界面语言到 `chrome.storage.local`，仅此而已。
+- **`storage`**：保存目标地址、界面语言和地址栏焦点开关到 `chrome.storage.local`，仅此而已。
 - 当前使用 `chrome.storage.local`，不经过 Chrome Sync。
 - 没有 host permissions、content scripts、分析、追踪或远程代码。
 - 扩展不读取网页内容，也不修改其他网站。
@@ -126,6 +129,12 @@ flowchart LR
 ```bash
 # 校验 manifest
 python3 -m json.tool manifest.json
+
+# 回归测试（Node 自带 test runner，无依赖）
+node --test tests/*.test.mjs
+
+# 带覆盖率
+node --test --experimental-test-coverage tests/*.test.mjs
 
 # 检查 JS 语法
 node --check background.js
@@ -176,7 +185,9 @@ GitHub 仓库的 Settings → Social preview 可以上传 `docs/social-preview.p
 | `redirect.js` | 读取地址；为空或无效时打开设置页 |
 | `options.html` | 设置页结构 |
 | `options.css` | Atelier 风格 token 和布局 |
-| `options.js` | 中英文、校验、保存、清空 |
+| `options.js` | 中英文、校验、保存、清空、地址栏焦点开关 |
+| `tests/redirect.test.mjs` | 跳转与地址栏焦点的回归测试 |
+| `tests/options.test.mjs` | 设置页的回归测试 |
 | `docs/cover.html` | 可编辑的 README 封面模板（亮/暗两版） |
 | `docs/cover.png` / `cover-dark.png` | 1600×900 封面 |
 | `docs/social-preview.png` | 1280×640 GitHub 社交预览 |
@@ -197,9 +208,17 @@ GitHub 仓库的 Settings → Social preview 可以上传 `docs/social-preview.p
 
 扩展不缓存目标页面。它只做一次普通导航；是否使用缓存由目标服务器的 `Cache-Control` / `ETag` 决定。
 
+**每次都要先点一下地址栏才能输入？**
+
+默认是这样：页面自己发起的跳转会把焦点从地址栏夺走。到设置页勾上「打开新标签页后保留地址栏焦点」，扩展改用浏览器发起的导航，地址栏一直在焦点上，打开新标签页就能直接输入网址或搜索。
+
+**打开这个开关后，后退行为会变吗？**
+
+会有一点。新标签页的历史里多出一条跳转页，所以在跳转后的第一个页面按后退，会重新加载一次目标页，看起来像没反应。再往前就没有可退的页面了，跟不开这个开关时一样。
+
 **为什么需要 storage 权限？**
 
-只用来记住目标地址和界面语言。没有别的用途。
+只用来记住目标地址、界面语言和地址栏焦点开关。没有别的用途。
 
 **可以上架 Chrome Web Store 吗？**
 

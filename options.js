@@ -10,9 +10,11 @@ const MESSAGES = {
     lede: "Choose the page that opens in every new tab. The first frame follows your system theme.",
     urlLabel: "Page URL",
     urlHint: "Only http:// and https:// addresses. If you leave out the protocol, https:// is added.",
+    focusLabel: "Keep the address bar focused in new tabs",
+    focusHint: "Type a URL or search without clicking the address bar. Save to apply.",
     save: "Save",
     clear: "Clear",
-    saved: "Saved. The next new tab will use this address.",
+    saved: "Saved. Your changes apply to the next new tab.",
     cleared: "Cleared. New tabs will open this settings page until you add an address.",
     invalid: "That address is not valid. Use an http:// or https:// URL.",
     currentLabel: "Current",
@@ -29,9 +31,11 @@ const MESSAGES = {
     lede: "设置每次打开新标签页时要进入的页面。首帧颜色跟随系统主题。",
     urlLabel: "页面地址",
     urlHint: "只支持 http:// 或 https:// 地址；不写协议时会自动补上 https://。",
+    focusLabel: "打开新标签页后保留地址栏焦点",
+    focusHint: "无需点击地址栏，就能输入网址或搜索。默认关闭，点击保存后生效。",
     save: "保存",
     clear: "清空",
-    saved: "已保存，下次打开新标签页会使用这个地址。",
+    saved: "已保存，下次打开新标签页生效。",
     cleared: "已清空。在填写地址之前，新标签页会打开这个设置页。",
     invalid: "地址格式不对，请填写 http:// 或 https:// 地址。",
     currentLabel: "当前",
@@ -47,6 +51,7 @@ const elements = {
   form: document.getElementById("settings-form"),
   input: document.getElementById("target-url"),
   help: document.getElementById("url-help"),
+  focusAddressBar: document.getElementById("focus-address-bar"),
   status: document.getElementById("status"),
   current: document.getElementById("current-value"),
   scheme: document.getElementById("scheme-status"),
@@ -170,7 +175,7 @@ function saveTarget(url) {
   renderStatus();
 
   if (hasStorage()) {
-    chrome.storage.local.set({ targetUrl: url });
+    chrome.storage.local.set({ targetUrl: url, focusAddressBar: elements.focusAddressBar.checked });
   }
 }
 
@@ -220,6 +225,10 @@ function bindEvents() {
   elements.form.addEventListener("submit", handleSubmit);
   elements.clear.addEventListener("click", handleClear);
   elements.input.addEventListener("input", handleInput);
+  elements.focusAddressBar.addEventListener("change", () => {
+    state.statusKey = "";
+    renderStatus();
+  });
 
   for (const button of elements.langButtons) {
     button.addEventListener("click", () => {
@@ -246,11 +255,12 @@ function load() {
   }
 
   chrome.storage.local.get(
-    { targetUrl: DEFAULT_URL, uiLanguage: DEFAULT_LANG },
+    { targetUrl: DEFAULT_URL, uiLanguage: DEFAULT_LANG, focusAddressBar: false },
     (items) => {
       state.language = items.uiLanguage === "zh" ? "zh" : DEFAULT_LANG;
       state.currentUrl = normalizeUrl(items.targetUrl) || "";
       elements.input.value = state.currentUrl;
+      elements.focusAddressBar.checked = items.focusAddressBar === true;
       renderAll();
     }
   );

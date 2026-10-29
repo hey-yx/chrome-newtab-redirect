@@ -279,6 +279,23 @@ body {
   color: var(--danger);
 }
 
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  color: var(--strong);
+  font-size: var(--text-ui);
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  margin: 3px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;

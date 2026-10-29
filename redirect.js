@@ -1,5 +1,20 @@
 const DEFAULT_URL = "";
 
+function openUrl(url, keepAddressBarFocus) {
+  if (keepAddressBarFocus && chrome.tabs?.getCurrent) {
+    chrome.tabs.getCurrent((tab) => {
+      if (tab?.id === undefined) {
+        location.replace(url);
+        return;
+      }
+      chrome.tabs.update(tab.id, { url });
+    });
+    return;
+  }
+
+  location.replace(url);
+}
+
 function normalizeUrl(raw) {
   let value = String(raw || "").trim();
   if (!value) {
@@ -36,12 +51,13 @@ function openSettings() {
 if (!chrome?.storage?.local) {
   openSettings();
 } else {
-  chrome.storage.local.get({ targetUrl: DEFAULT_URL }, (items) => {
+  chrome.storage.local.get({ targetUrl: DEFAULT_URL, focusAddressBar: false }, (items) => {
     const url = normalizeUrl(items.targetUrl);
-    if (url) {
-      location.replace(url);
-    } else {
+    if (!url) {
       openSettings();
+      return;
     }
+
+    openUrl(url, items.focusAddressBar === true);
   });
 }
