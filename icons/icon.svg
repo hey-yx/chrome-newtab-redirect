@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <!-- Hallmark · static icon · theme: existing Atelier · pre-emit critique: P5 H4 E5 S4 R5 V4 -->
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#49539A"/>
+  <g stroke="#F1F5F8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M54 34H49Q45 34 43 38L38 48H34Q30 48 30 52V88Q30 94 36 94H88Q94 94 94 88V74"/>
+    <path d="M59 69L94 34M73 34H94V55"/>
+  </g>
+</svg>

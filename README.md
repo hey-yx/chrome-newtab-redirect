@@ -180,6 +180,7 @@ GitHub 仓库的 Settings → Social preview 可以上传 `docs/social-preview.p
 | 文件 | 作用 |
 | --- | --- |
 | `manifest.json` | Manifest V3 配置 |
+| `icons/icon.svg` / `icon-*.png` | 可编辑的图标源文件及 16/32/48/128 像素图标 |
 | `background.js` | 首次安装打开设置页；工具栏图标点击 |
 | `redirect.html` | 新标签页首帧（白/黑） |
 | `redirect.js` | 读取地址；为空或无效时打开设置页 |
@@ -188,6 +189,7 @@ GitHub 仓库的 Settings → Social preview 可以上传 `docs/social-preview.p
 | `options.js` | 中英文、校验、保存、清空、地址栏焦点开关 |
 | `tests/redirect.test.mjs` | 跳转与地址栏焦点的回归测试 |
 | `tests/options.test.mjs` | 设置页的回归测试 |
+| `tests/icons.test.mjs` | 图标尺寸、工具栏图标和 favicon 的回归测试 |
 | `docs/cover.html` | 可编辑的 README 封面模板（亮/暗两版） |
 | `docs/cover.png` / `cover-dark.png` | 1600×900 封面 |
 | `docs/social-preview.png` | 1280×640 GitHub 社交预览 |
