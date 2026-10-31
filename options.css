@@ -1,4 +1,4 @@
-/* Hallmark · component: settings form · genre: editorial · theme: Atelier (borrowed from ui-design-articles)
+/* Hallmark · component: settings form · genre: editorial · theme: Atelier (borrowed from speccite)
  * pre-emit critique: P5 H5 E5 S5 R5 V4
  * states: default · hover · focus-visible · active · disabled · loading · error · success
  * contrast: pass (40–41) · tokens: pass (48) · responsive: pass (34, 49, 50–57)
@@ -7,7 +7,7 @@
 :root {
   color-scheme: light;
 
-  /* Atelier palette — ui-design-articles, 2026-10-19 */
+  /* Atelier palette — speccite, 2026-10-19 */
   --bg: #F1F5F8;
   --hover: #E6EBF1;
   --selection: #D0D9EC;
